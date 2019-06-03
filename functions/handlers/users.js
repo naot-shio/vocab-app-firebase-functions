@@ -91,6 +91,8 @@ exports.imageUploader = (req, res) => {
   let uploadedImage = {};
 
   busboy.on('file', function(fieldname, file, filename, encoding, mimetype) {
+    if (mimetype !== 'image/jpeg' && mimetype !== 'image/png') return res.status(400).json({ error: 'Wrong type of file' })
+
     const imageExtension = filename.split('.')[filename.split('.').length - 1];
     const randomNumberForImageName = Math.floor(Math.random() * 1000000000)
     imageFileName = `${randomNumberForImageName}.${imageExtension}`
