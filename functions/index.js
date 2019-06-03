@@ -72,7 +72,7 @@ const emailValidation = (user, errors) => {
   if (notFilledIn(user.email)) {
     errors.email = messageForNoInput
   } else if (!isValidEmailAddress(user.email)) {
-    errors.email = "Invalid email address"
+    errors.email = 'Invalid email address'
   };
 }
 
@@ -81,7 +81,7 @@ const passwordValidation = (user, errors) => {
   if (user.password.length < 6) errors.password = 'Password must be at least 6 characters'
 }
 
-const messageForNoInput = "Must be filled in";
+const messageForNoInput = 'Must be filled in';
 
 // Sign Up route
 app.post('/signup', (req, res) => {
@@ -97,7 +97,7 @@ app.post('/signup', (req, res) => {
   emailValidation(newUser, errors);
   passwordValidation(newUser, errors);
 
-  if (newUser.password !== newUser.confirmPassword) errors.confirmPassword = "Password confirmation does not match with password";
+  if (newUser.password !== newUser.confirmPassword) errors.confirmPassword = 'Password confirmation does not match with password';
   if (notFilledIn(newUser.name)) errors.name = messageForNoInput;
 
   if (Object.keys(errors).length > 0) return res.status(400).json({ errors })
@@ -131,7 +131,7 @@ app.post('/signup', (req, res) => {
     })
     .catch(err => {
       console.error(err);
-      if (err.code === "auth/email-already-in-use") return res.status(400).json({ email: 'Email is already taken'})
+      if (err.code === 'auth/email-already-in-use') return res.status(400).json({ email: 'Email is already taken'})
       return res.status(500).json({ error: err.code })
     })
 })
@@ -158,7 +158,7 @@ app.post('/login', (req, res) => {
     }) 
     .catch(err => {
       console.error(err);
-      if (err.code === "auth/user-not-found") return res.status(403).json({ general: 'User not found'})
+      if (err.code === 'auth/user-not-found') return res.status(403).json({ general: 'User not found'})
       return res.status(500).json({ error: err.code });
     })
 })
