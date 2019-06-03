@@ -6,6 +6,8 @@ firebase.initializeApp(config);
 
 const { signUpValidator, loginValidator } = require('../utils/validations')
 
+const imageUrl = (imageFile) => `https://firebasestorage.googleapis.com/v0/b/${config.storageBucket}/o/${imageFile}?alt=media`
+
 exports.signUp = (req, res) => {
   const newUser = {
     email: req.body.email,
@@ -16,6 +18,8 @@ exports.signUp = (req, res) => {
 
   const {valid, errors} = signUpValidator(newUser);
   if (!valid) return res.status(400).json(errors);
+
+  const initialProfile = 'blank-profile-picture.png'
 
   let token, userId;
   db
@@ -37,6 +41,7 @@ exports.signUp = (req, res) => {
         name: newUser.name,
         email: newUser.email,
         createdAt: new Date().toISOString(),
+        imageUrl: imageUrl(initialProfile),
         userId
       };
       return db.doc(`/users/${newUser.name}`).set(userCredentials);
@@ -74,7 +79,7 @@ exports.login = (req, res) => {
     })
 }
 
-exports.uploadImage = (req, res) => {
+exports.imageUploader = (req, res) => {
   const BusBoy = require('busboy');
   const path = require('path');
   const os = require('os');
@@ -103,8 +108,7 @@ exports.uploadImage = (req, res) => {
       }
     })
     .then(() => {
-      const imageUrl = `https://firebasestorage.googleapis.com/v0/b${config.storageBucket}/o/${imageFileName}?alt=media`
-      return db.doc(`/users/${req.user.name}`).update({ imageUrl })
+      return db.doc(`/users/${req.user.name}`).update({ imageUrl: imageUrl(imageFileName) })
     })
     .then(() => {
       return res.json({ message: 'Image uploaded'})
