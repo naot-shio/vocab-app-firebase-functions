@@ -57,6 +57,17 @@ app.post('/word', (req, res) => {
     });
 });
 
+const notFilledIn = (string) => {
+  if (string.trim() === '') return true;
+  return false;
+}
+
+const validateEmail = (email) => {
+  const regEx = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+  if (email.match(regEx)) return true;
+  return false;
+}
+
 // Sign Up route
 app.post('/signup', (req, res) => {
   const newUser = {
@@ -65,6 +76,22 @@ app.post('/signup', (req, res) => {
     confirmPassword: req.body.confirmPassword,
     name: req.body.name
   };
+
+  let errors = {};
+  const messageForNoInput = "Must be filled in";
+
+  if (notFilledIn(newUser.email)) {
+    errors.email = messageForNoInput
+  } else if (!validateEmail(newUser.email)) {
+    errors.email = "Invalid email"
+  };
+ 
+  if (notFilledIn(newUser.password)) errors.password = messageForNoInput;
+  if (notFilledIn(newUser.confirmPassword)) errors.confirmPassword = messageForNoInput;
+  if (newUser.password !== newUser.confirmPassword) errors.confirmPassword = "Password confirmation does not match with password";
+  if (notFilledIn(newUser.name)) errors.name = messageForNoInput;
+
+  if (Object.keys(errors).length > 0) return res.status(400).json({ errors })
 
   let token, userId;
   db
