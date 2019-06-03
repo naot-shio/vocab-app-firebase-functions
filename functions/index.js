@@ -13,7 +13,7 @@ firebase.initializeApp(config);
 const db = admin.firestore();
 
 app.get('/words', (req, res) => {
-  db()
+  db
     .collection('words')
     .orderBy('createdAt', 'desc')
     .get()
@@ -35,9 +35,36 @@ app.get('/words', (req, res) => {
     .catch(err => console.error(err));
 });
 
-app.post('/word', (req, res) => {
+const FBAuth = (req, res, next) => {
+  let idToken;
+  if (req.headers.authorization && req.headers.authorization.startsWith('Bearer ')) {
+    idToken = req.headers.authorization.split('Bearer ')[1];
+  } else {
+    console.log('No token found');
+    return res.status(403).json({ errors: 'Unauthorized' });
+  }
+  
+  admin
+    .auth()
+    .verifyIdToken(idToken)
+    .then(decodedToken => {
+      req.user = decodedToken;
+      console.log(decodedToken);
+      return db.collection('users').where('userId', '==', req.user.uid).limit(1).get();
+    })
+    .then(data => {
+      req.user.name = data.docs[0].data().name;
+      return next();
+    })
+    .catch(err => {
+      console.error(err);
+      return res.status(403).json(err);
+    });
+}
+
+app.post('/word', FBAuth, (req, res) => {
   const newWord = {
-    userName: req.body.userName,
+    userName: req.user.name,
     english: req.body.english,
     japanese: req.body.japanese,
     sentence: req.body.sentence,
@@ -45,7 +72,7 @@ app.post('/word', (req, res) => {
     createdAt: new Date().toISOString()
   };
   
-  db()
+  db
     .collection('words')
     .add(newWord)
     .then(doc => {
