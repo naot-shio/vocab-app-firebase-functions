@@ -1,4 +1,4 @@
-const { db } = require('../utils/admin');
+const { admin, db } = require('../utils/admin');
 
 const firebase = require('firebase');
 const config = require('../utils/config');
@@ -74,3 +74,44 @@ exports.login = (req, res) => {
     })
 }
 
+exports.uploadImage = (req, res) => {
+  const BusBoy = require('busboy');
+  const path = require('path');
+  const os = require('os');
+  const fs = require('fs');
+
+  const busboy = new BusBoy({ headers: req.headers });
+
+  let imageFileName;
+  let uploadedImage = {};
+
+  busboy.on('file', function(fieldname, file, filename, encoding, mimetype) {
+    const imageExtension = filename.split('.')[filename.split('.').length - 1];
+    const randomNumberForImageName = Math.floor(Math.random() * 1000000000)
+    imageFileName = `${randomNumberForImageName}.${imageExtension}`
+    const filepath = path.join(os.tmpdir(), imageFileName);
+    uploadedImage = { filepath, mimetype };
+    file.pipe(fs.createWriteStream(filepath));
+  });
+  busboy.on('finish', () => {
+    admin.storage().bucket().upload(uploadedImage.filepath, {
+      resumable: false,
+      metadata: {
+        metadata: {
+          contentType: uploadedImage.mimetype
+        }
+      }
+    })
+    .then(() => {
+      const imageUrl = `https://firebasestorage.googleapis.com/v0/b${config.storageBucket}/o/${imageFileName}?alt=media`
+      return db.doc(`/users/${req.user.name}`).update({ imageUrl })
+    })
+    .then(() => {
+      return res.json({ message: 'Image uploaded'})
+    })
+    .catch(err => {
+      console.error(err);
+      return res.status(500).json({ error: err.code });
+    })
+  })
+}
