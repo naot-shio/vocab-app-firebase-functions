@@ -68,6 +68,8 @@ const validateEmail = (email) => {
   return false;
 }
 
+const messageForNoInput = "Must be filled in";
+
 // Sign Up route
 app.post('/signup', (req, res) => {
   const newUser = {
@@ -78,12 +80,11 @@ app.post('/signup', (req, res) => {
   };
 
   let errors = {};
-  const messageForNoInput = "Must be filled in";
-
+  
   if (notFilledIn(newUser.email)) {
     errors.email = messageForNoInput
   } else if (!validateEmail(newUser.email)) {
-    errors.email = "Invalid email"
+    errors.email = "Invalid email address"
   };
  
   if (notFilledIn(newUser.password)) errors.password = messageForNoInput;
@@ -124,6 +125,36 @@ app.post('/signup', (req, res) => {
       console.error(err);
       if (err.code === "auth/email-already-in-use") return res.status(400).json({ email: 'Email is already taken'})
       return res.status(500).json({ error: err.code })
+    })
+})
+
+app.post('/login', (req, res) => {
+  const user = {
+    email: req.body.email, 
+    password: req.body.password 
+  };
+
+  let errors = {};
+  if (notFilledIn(user.email)) {
+    errors.email = messageForNoInput;
+  } else if (!validateEmail(user.email)) {
+    errors.email = "Invalid email address"
+  };
+  if (notFilledIn(user.password)) errors.password = messageForNoInput;
+
+  if (Object.keys(errors).length > 0) return res.status(400).json({ errors });
+
+  firebase.auth().signInWithEmailAndPassword(user.email, user.password)
+    .then(data => {
+      return data.user.getIdToken();
+    })
+    .then(token => {
+      return res.json({ token });
+    }) 
+    .catch(err => {
+      console.error(err);
+      if (err.code === "auth/user-not-found") return res.status(403).json({ general: 'User not found'})
+      return res.status(500).json({ error: err.code });
     })
 })
 
