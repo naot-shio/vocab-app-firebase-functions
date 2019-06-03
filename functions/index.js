@@ -36,7 +36,7 @@ app.post('/word', (req, res) => {
     japanese: req.body.japanese,
     sentence: req.body.sentence,
     translation: req.body.translation,
-    createdAt: new Date().ISOString()
+    createdAt: new Date().toISOString()
   };
   
   admin.firestore()
