@@ -62,10 +62,23 @@ const notFilledIn = (string) => {
   return false;
 }
 
-const validateEmail = (email) => {
+const isValidEmailAddress = (email) => {
   const regEx = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
   if (email.match(regEx)) return true;
   return false;
+}
+
+const emailValidation = (user, errors) => {
+  if (notFilledIn(user.email)) {
+    errors.email = messageForNoInput
+  } else if (!isValidEmailAddress(user.email)) {
+    errors.email = "Invalid email address"
+  };
+}
+
+const passwordValidation = (user, errors) => {
+  if (notFilledIn(user.password)) errors.password = messageForNoInput;
+  if (user.password.length < 6) errors.password = 'Password must be at least 6 characters'
 }
 
 const messageForNoInput = "Must be filled in";
@@ -81,14 +94,9 @@ app.post('/signup', (req, res) => {
 
   let errors = {};
   
-  if (notFilledIn(newUser.email)) {
-    errors.email = messageForNoInput
-  } else if (!validateEmail(newUser.email)) {
-    errors.email = "Invalid email address"
-  };
- 
-  if (notFilledIn(newUser.password)) errors.password = messageForNoInput;
-  if (notFilledIn(newUser.confirmPassword)) errors.confirmPassword = messageForNoInput;
+  emailValidation(newUser, errors);
+  passwordValidation(newUser, errors);
+
   if (newUser.password !== newUser.confirmPassword) errors.confirmPassword = "Password confirmation does not match with password";
   if (notFilledIn(newUser.name)) errors.name = messageForNoInput;
 
@@ -135,12 +143,9 @@ app.post('/login', (req, res) => {
   };
 
   let errors = {};
-  if (notFilledIn(user.email)) {
-    errors.email = messageForNoInput;
-  } else if (!validateEmail(user.email)) {
-    errors.email = "Invalid email address"
-  };
-  if (notFilledIn(user.password)) errors.password = messageForNoInput;
+  
+  emailValidation(user, errors);
+  passwordValidation(user, errors);
 
   if (Object.keys(errors).length > 0) return res.status(400).json({ errors });
 
