@@ -3,8 +3,13 @@ const admin = require('firebase-admin')
 
 admin.initializeApp();
 
-exports.getWords = functions.https.onRequest((req, res) => {
-  admin.firestore().collection('words').get()
+const express = require('express');
+const app = express();
+
+app.get('/words', (req, res) => {
+  admin.firestore()
+    .collection('words')
+    .get()
     .then(data => {
       let words = [];
       data.forEach(doc => {
@@ -13,4 +18,6 @@ exports.getWords = functions.https.onRequest((req, res) => {
       return res.json(words);
     })
     .catch(err => console.error(err));
-})
+});
+
+exports.api = functions.https.onRequest(app);
