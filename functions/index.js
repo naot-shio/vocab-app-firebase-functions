@@ -16,12 +16,12 @@ app.get('/words', (req, res) => {
       data.forEach(doc => {
         words.push({
           wordId: doc.id,
-          userName: req.data().userName,
-          english: req.data().english,
-          japanese: req.data().japanese,
-          sentence: req.data().sentence,
-          translation: req.data().translation,
-          createdAt: req.data().createdAt
+          userName: doc.data().userName,
+          english: doc.data().english,
+          japanese: doc.data().japanese,
+          sentence: doc.data().sentence,
+          translation: doc.data().translation,
+          createdAt: doc.data().createdAt
         })
       });
       return res.json(words);
@@ -51,4 +51,4 @@ app.post('/word', (req, res) => {
     });
 });
 
-exports.api = functions.https.onRequest(app);
+exports.api = functions.region('asia-northeast1').https.onRequest(app);
