@@ -9,11 +9,20 @@ const app = express();
 app.get('/words', (req, res) => {
   admin.firestore()
     .collection('words')
+    .orderBy('createdAt', 'desc')
     .get()
     .then(data => {
       let words = [];
       data.forEach(doc => {
-        words.push(doc.data());
+        words.push({
+          wordId: doc.id,
+          userName: req.data().userName,
+          english: req.data().english,
+          japanese: req.data().japanese,
+          sentence: req.data().sentence,
+          translation: req.data().translation,
+          createdAt: req.data().createdAt
+        })
       });
       return res.json(words);
     })
