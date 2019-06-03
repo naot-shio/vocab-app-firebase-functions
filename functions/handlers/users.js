@@ -50,7 +50,6 @@ exports.signUp = (req, res) => {
       return res.status(201).json({ token });
     })
     .catch(err => {
-      console.error(err);
       if (err.code === 'auth/email-already-in-use') return res.status(400).json({ email: 'Email is already taken'})
       return res.status(500).json({ error: err.code })
     })
@@ -73,7 +72,6 @@ exports.login = (req, res) => {
       return res.json({ token });
     }) 
     .catch(err => {
-      console.error(err);
       if (err.code === 'auth/user-not-found') return res.status(403).json({ general: 'User not found'})
       return res.status(500).json({ error: err.code });
     })
@@ -116,7 +114,6 @@ exports.imageUploader = (req, res) => {
       return res.json({ message: 'Image uploaded'})
     })
     .catch(err => {
-      console.error(err);
       return res.status(500).json({ error: err.code });
     });
   });

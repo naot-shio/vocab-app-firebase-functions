@@ -20,7 +20,9 @@ exports.getAllWords = (req, res) => {
       });
       return res.json(words);
     })
-    .catch(err => console.error(err));
+    .catch(err => {
+      return res.status(500).json(err);
+    });
 }
 
 exports.createWord = (req, res) => {
