@@ -10,8 +10,10 @@ const firebase = require('firebase')
 const config = require('./utils/config')
 firebase.initializeApp(config);
 
+const db = admin.firestore();
+
 app.get('/words', (req, res) => {
-  admin.firestore()
+  db()
     .collection('words')
     .orderBy('createdAt', 'desc')
     .get()
@@ -43,7 +45,7 @@ app.post('/word', (req, res) => {
     createdAt: new Date().toISOString()
   };
   
-  admin.firestore()
+  db()
     .collection('words')
     .add(newWord)
     .then(doc => {
@@ -64,13 +66,37 @@ app.post('/signup', (req, res) => {
     name: req.body.name
   };
 
-  firebase.auth().createUserWithEmailAndPassword(newUser.email, newUser.password)
+  let token, userId;
+  db
+    .doc(`/users/${newUser.name}`)
+    .get()
+    .then(doc => {
+      if (doc.exists) return res.status(400).json({ name: 'User name is already taken'})
+      return firebase
+        .auth()
+        .createUserWithEmailAndPassword(newUser.email, newUser.password)
+    })
     .then(data => {
-      return res.status(201).json({ message: `User ${data.user.uid} signed up successfully`})
+      userId = data.user.uid;
+      return data.user.getIdToken();
+    })
+    .then(idToken => {
+      token = idToken;
+      const userCredentials = {
+        name: newUser.name,
+        email: newUser.email,
+        createdAt: new Date().toISOString(),
+        userId
+      };
+      return db.doc(`/users/${newUser.name}`).set(userCredentials);
+    })
+    .then(() => {
+      return res.status(201).json({ token });
     })
     .catch(err => {
-      console.err(err);
-      return res.status(500).json({ error: err.code });
+      console.error(err);
+      if (err.code === "auth/email-already-in-use") return res.status(400).json({ email: 'Email is already taken'})
+      return res.status(500).json({ error: err.code })
     })
 })
 
