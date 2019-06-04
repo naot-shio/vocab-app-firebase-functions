@@ -32,14 +32,17 @@ exports.createWord = (req, res) => {
     japanese: req.body.japanese,
     sentence: req.body.sentence,
     translation: req.body.translation,
-    createdAt: new Date().toISOString()
+    createdAt: new Date().toISOString(),
+    likeCount: 0
   };
   
   db
     .collection('words')
     .add(newWord)
     .then(doc => {
-      res.json({ message: `document ${doc.id} created successfully`});
+      const word = newWord;
+      word.wordId = doc.id;
+      res.json(word);
     })
     .catch(err => {
       res.status(500).json({ error: 'Something went wrong'});
