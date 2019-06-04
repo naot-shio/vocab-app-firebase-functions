@@ -43,6 +43,5 @@ exports.createWord = (req, res) => {
     })
     .catch(err => {
       res.status(500).json({ error: 'Something went wrong'});
-      console.err(err);
     });
 }
