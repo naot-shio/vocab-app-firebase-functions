@@ -4,9 +4,9 @@ const firebase = require('firebase');
 const config = require('../utils/config');
 firebase.initializeApp(config);
 
-const { signUpValidator, loginValidator } = require('../utils/validations')
+const { signUpValidator, loginValidator } = require('../utils/validations');
 
-const imageUrl = (imageFile) => `https://firebasestorage.googleapis.com/v0/b/${config.storageBucket}/o/${imageFile}?alt=media`
+const imageUrl = (imageFile) => `https://firebasestorage.googleapis.com/v0/b/${config.storageBucket}/o/${imageFile}?alt=media`;
 
 exports.signUp = (req, res) => {
   const newUser = {
@@ -26,10 +26,10 @@ exports.signUp = (req, res) => {
     .doc(`/users/${newUser.name}`)
     .get()
     .then(doc => {
-      if (doc.exists) return res.status(400).json({ name: 'User name is already taken'})
+      if (doc.exists) return res.status(400).json({ name: 'User name is already taken'});
       return firebase
         .auth()
-        .createUserWithEmailAndPassword(newUser.email, newUser.password)
+        .createUserWithEmailAndPassword(newUser.email, newUser.password);
     })
     .then(data => {
       userId = data.user.uid;
@@ -50,8 +50,8 @@ exports.signUp = (req, res) => {
       return res.status(201).json({ token });
     })
     .catch(err => {
-      if (err.code === 'auth/email-already-in-use') return res.status(400).json({ email: 'Email is already taken'})
-      return res.status(500).json({ error: err.code })
+      if (err.code === 'auth/email-already-in-use') return res.status(400).json({ email: 'Email is already taken'});
+      return res.status(500).json({ error: err.code });
     })
 }
 
@@ -72,7 +72,7 @@ exports.login = (req, res) => {
       return res.json({ token });
     }) 
     .catch(err => {
-      if (err.code === 'auth/user-not-found') return res.status(403).json({ general: 'User not found'})
+      if (err.code === 'auth/user-not-found') return res.status(403).json({ general: 'User not found' })
       return res.status(500).json({ error: err.code });
     })
 }
@@ -91,13 +91,17 @@ exports.imageUploader = (req, res) => {
   busboy.on('file', function(fieldname, file, filename, encoding, mimetype) {
     if (mimetype !== 'image/jpeg' && mimetype !== 'image/png') return res.status(400).json({ error: 'Wrong type of file' })
 
-    const imageExtension = filename.split('.')[filename.split('.').length - 1];
-    const randomNumberForImageName = Math.floor(Math.random() * 1000000000)
-    imageFileName = `${randomNumberForImageName}.${imageExtension}`
+    const splitFile = filename.split('.');
+    const imageExtension = splitFile[splitFile.length - 1];
+
+    const randomNumberForImageName = Math.floor(Math.random() * 1000000000);
+
+    imageFileName = `${randomNumberForImageName}.${imageExtension}`;
     const filepath = path.join(os.tmpdir(), imageFileName);
     uploadedImage = { filepath, mimetype };
     file.pipe(fs.createWriteStream(filepath));
   });
+
   busboy.on('finish', () => {
     admin.storage().bucket().upload(uploadedImage.filepath, {
       resumable: false,
@@ -108,14 +112,15 @@ exports.imageUploader = (req, res) => {
       }
     })
     .then(() => {
-      return db.doc(`/users/${req.user.name}`).update({ imageUrl: imageUrl(imageFileName) })
+      return db.doc(`/users/${req.user.name}`).update({ imageUrl: imageUrl(imageFileName) });
     })
     .then(() => {
-      return res.json({ message: 'Image uploaded'})
+      return res.json({ message: 'Image uploaded'});
     })
     .catch(err => {
       return res.status(500).json({ error: err.code });
     });
   });
+
   busboy.end(req.rawBody);
 }
