@@ -77,6 +77,34 @@ exports.login = (req, res) => {
     })
 }
 
+exports.getOwnDetails = (req, res) => {
+  let userData = {};
+  db
+    .doc(`/users/${req.user.name}`)
+    .get()
+    .then(doc => {
+      if (doc.exists) {
+        userData.credentials = doc.data();
+        return db
+          .collection('stocks', 'likes')
+          .where('userName', '==', req.user.name)
+          .get();
+      }
+    })
+    .then(data => {
+      userData.stocks = [];
+      userData.likes = [];
+      data.forEach(doc => {
+        userData.stocks.push(doc.data())
+      })
+      return res.json(userData);
+    })
+    .catch(err => {
+      console.error(err)
+      return res.status(500).json({ error: err.code })
+    })
+}
+
 exports.imageUploader = (req, res) => {
   const BusBoy = require('busboy');
   const path = require('path');
