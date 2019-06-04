@@ -32,7 +32,8 @@ exports.createWord = (req, res) => {
     sentence: req.body.sentence,
     translation: req.body.translation,
     createdAt: new Date().toISOString(),
-    likeCount: 0
+    likeCount: 0,
+    stockCount: 0
   };
   
   db
