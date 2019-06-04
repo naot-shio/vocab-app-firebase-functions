@@ -48,3 +48,42 @@ exports.createWord = (req, res) => {
       res.status(500).json({ error: 'Something went wrong'});
     });
 }
+
+exports.likeWord = (req, res) => {
+  const likeDocument = db
+    .collection('likes')
+    .where('userName', '==', req.user.name)
+    .where('wordId', '==', req.params.wordId)
+    .limit(1);
+
+    const wordDocument = db.doc(`/words/${req.params.wordId}`)
+
+    let wordData = {};
+
+    wordDocument
+      .get()
+      .then(doc => {
+        if (doc.exists) {
+          wordData = doc.data();
+          wordData.wordId = doc.id;
+          return likeDocument.get()
+        }
+        return res.status(404).json({ error: 'Not Found' })
+      })
+      .then(data => {
+        if (data.empty) return db
+          .collection('likes')
+          .add({
+            wordId: req.params.wordId,
+            userName: req.user.name
+          })
+          .then(() => {
+            wordData.likeCount++;
+            return wordDocument.update({ likeCount: wordData.likeCount })
+          })
+          .then(() => res.json(wordData))
+          .catch(err => res.status(500).json({ error: err.code }));
+        return res.status(400).json({ error: 'Already liked'});
+      })
+      .catch(err => res.status(500).json({ error: err.code }));
+}
