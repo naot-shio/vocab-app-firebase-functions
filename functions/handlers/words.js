@@ -1,5 +1,5 @@
 const { db } = require('../utils/admin')
-const { findLikeDocument, findWordDocument, findStockDocument } = require('../utils/dbDocument')
+const { findWordDocument } = require('../utils/dbDocument')
 
 exports.getAllWords = (req, res) => {
   db
@@ -16,7 +16,9 @@ exports.getAllWords = (req, res) => {
           japanese: doc.data().japanese,
           sentence: doc.data().sentence,
           translation: doc.data().translation,
-          createdAt: doc.data().createdAt
+          createdAt: doc.data().createdAt,
+          likeCount: doc.data().likeCount,
+          stockCount: doc.data().stockCount
         })
       });
       return res.json(words);
@@ -47,132 +49,47 @@ exports.createWord = (req, res) => {
     .catch(err => res.status(500).json({ error: err.code }));
 }
 
-exports.likeWord = (req, res) => {
-  const likeDocument = findLikeDocument(req);
+exports.updateWord = (req, res) => {
   const wordDocument = findWordDocument(req);
-  let wordData = {};
 
   wordDocument
     .get()
     .then(doc => {
-      if (doc.exists) {
-        wordData = doc.data();
-        wordData.wordId = doc.id;
-        return likeDocument.get();
+      if (!doc.exists) {
+        return res.status(404).json({ message: 'Not found' });
+      } else if (doc.data().userName !== req.user.name) {
+        return res.status(403).json({ error: "This word does not belong to you"});
       }
-      return res.status(404).json({ error: 'Not Found' });
+      let updateWord = {
+        english: req.body.english,
+        japanese: req.body.japanese,
+        sentence: req.body.sentence,
+        translation: req.body.translation,
+        updatedAt: new Date().toISOString()
+      };
+      return wordDocument.update(updateWord);
     })
-    .then(data => {
-      console.log(data)
-      if (data.empty) return db
-        .collection('likes')
-        .add({
-          wordId: req.params.wordId,
-          userName: req.user.name
-        })
-        .then(() => {
-          wordData.likeCount++;
-          return wordDocument.update({ likeCount: wordData.likeCount });
-        })
-        .then(() => res.json(wordData))
-        .catch(err => res.status(500).json({ error: err.code }));
-      return res.status(400).json({ error: 'Already liked'});
+    .then(() => {
+      return res.json({ message: 'Word successfully updated' });
     })
     .catch(err => res.status(500).json({ error: err.code }));
 }
 
-exports.unlikeWord = (req, res) => {
-  const likeDocument = findLikeDocument(req);
+exports.deleteWord = (req, res) => {
   const wordDocument = findWordDocument(req);
-  let wordData = {};
 
   wordDocument
     .get()
     .then(doc => {
-      if (doc.exists) {
-        wordData = doc.data();
-        wordData.wordId = doc.id;
-        return likeDocument.get();
+      if (!doc.exists) {
+        return res.status(404).json({ message: 'Not found' });
+      } else if (doc.data().userName !== req.user.name) {
+        return res.status(403).json({ error: "This word does not belong to you"});
       }
-      return res.status(404).json({ error: 'Not Found' });
+      return wordDocument.delete()
     })
-    .then(data => {
-      if (!data.empty) return db
-        .doc(`likes/${data.docs[0].id}`)
-        .delete()
-        .then(() => {
-          wordData.likeCount--;
-          return wordDocument.update({ likeCount: wordData.likeCount });
-        })
-        .then(() => res.json(wordData))
-        .catch(err => res.status(500).json({ error: err.code }));
-
-      return res.status(400).json({ error: 'Has not been liked'});
-    })
-    .catch(err => res.status(500).json({ error: err.code }));
-}
-
-exports.stockWord = (req, res) => {
-  const stockDocument = findStockDocument(req);
-  const wordDocument = findWordDocument(req);
-  let wordData = {};
-
-  wordDocument
-    .get()
-    .then(doc => {
-      if (doc.exists) {
-        wordData = doc.data();
-        wordData.wordId = doc.id;
-        return stockDocument.get();
-      }
-      return res.status(404).json({ error: 'Not Found' });
-    })
-    .then(data => {
-      console.log(data)
-      if (data.empty) return db
-        .collection('stocks')
-        .add({
-          wordId: req.params.wordId,
-          userName: req.user.name
-        })
-        .then(() => {
-          wordData.stockCount++;
-          return wordDocument.update({ stockCount: wordData.stockCount });
-        })
-        .then(() => res.json(wordData))
-        .catch(err => res.status(500).json({ error: err.code }));
-      return res.status(400).json({ error: 'Already stocked'});
-    })
-    .catch(err => res.status(500).json({ error: err.code }));
-}
-
-exports.unstockWord = (req, res) => {
-  const stockDocument = findStockDocument(req);
-  const wordDocument = findWordDocument(req);
-  let wordData = {};
-
-  wordDocument
-    .get()
-    .then(doc => {
-      if (doc.exists) {
-        wordData = doc.data();
-        wordData.wordId = doc.id;
-        return stockDocument.get();
-      }
-      return res.status(404).json({ error: 'Not Found' });
-    })
-    .then(data => {
-      if (!data.empty) return db
-        .doc(`stocks/${data.docs[0].id}`)
-        .delete()
-        .then(() => {
-          wordData.stockCount--;
-          return wordDocument.update({ stockCount: wordData.stockCount });
-        })
-        .then(() => res.json(wordData))
-        .catch(err => res.status(500).json({ error: err.code }));
-
-      return res.status(400).json({ error: 'Has not been stocked'});
+    .then(() => {
+      res.json({ message: 'Successfully deleted'})
     })
     .catch(err => res.status(500).json({ error: err.code }));
 }
