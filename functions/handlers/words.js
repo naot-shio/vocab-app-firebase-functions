@@ -1,5 +1,5 @@
 const { db } = require('../utils/admin')
-const { findLikeDocument, findWordDocument, isDocumentFound } = require('../utils/dbDocument')
+const { findLikeDocument, findWordDocument } = require('../utils/dbDocument')
 
 exports.getAllWords = (req, res) => {
   db
@@ -21,9 +21,7 @@ exports.getAllWords = (req, res) => {
       });
       return res.json(words);
     })
-    .catch(err => {
-      return res.status(500).json(err);
-    });
+    .catch(err => res.status(500).json(err));
 }
 
 exports.createWord = (req, res) => {
@@ -45,9 +43,7 @@ exports.createWord = (req, res) => {
       word.wordId = doc.id;
       res.json(word);
     })
-    .catch(err => {
-      res.status(500).json({ error: 'Something went wrong'});
-    });
+    .catch(err => res.status(500).json({ error: err.code }));
 }
 
 exports.likeWord = (req, res) => {
@@ -81,11 +77,7 @@ exports.likeWord = (req, res) => {
         .catch(err => res.status(500).json({ error: err.code }));
       return res.status(400).json({ error: 'Already liked'});
     })
-    .catch(err => {
-      console.error(err);
-      return res.status(500).json({ error: err.code })
-    }
-      );
+    .catch(err => res.status(500).json({ error: err.code }));
 }
 
 exports.unlikeWord = (req, res) => {
