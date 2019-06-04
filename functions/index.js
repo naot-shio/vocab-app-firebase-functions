@@ -5,6 +5,8 @@ const app = express();
 
 const FBAuth = require('./utils/fbAuth');
 
+const { db } = require('./utils/admin');
+
 const { 
   getAllWords,
   createWord,
@@ -43,3 +45,34 @@ app.post('/user/image', FBAuth, imageUploader);
 app.get('/user', FBAuth, getOwnDetails);
 
 exports.api = functions.region('asia-northeast1').https.onRequest(app);
+
+exports.onDeletingWord = functions
+  .region('asia-northeast1')
+  .firestore
+  .document('/words/{wordId}')
+  .onDelete((snapshot, context) => {
+    const wordId = context.params.wordId;
+    const batch = db.batch();
+    return db
+      .collection('likes')
+      .where('wordId', '==', wordId)
+      .get()
+      .then(data => {
+        data.forEach(doc => {
+          batch.delete(db.doc(`/likes/${doc.id}`));
+        });
+        return db
+          .collection('stocks')
+          .where('wordId', '==', wordId)
+          .get()
+      })
+      .then(data => {
+        data.forEach(doc => {
+          batch.delete(db.doc(`/stocks/${doc.id}`));
+        });
+        return batch.commit();
+      })
+      .catch(err => {
+        console.error(err);
+      })
+});
