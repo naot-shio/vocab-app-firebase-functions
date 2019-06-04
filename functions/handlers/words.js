@@ -1,5 +1,5 @@
 const { db } = require('../utils/admin')
-const { findLikeDocument, findWordDocument, findStockDocument } = require('../utils/dbDocument')
+const { findWordDocument } = require('../utils/dbDocument')
 
 exports.getAllWords = (req, res) => {
   db
@@ -16,7 +16,9 @@ exports.getAllWords = (req, res) => {
           japanese: doc.data().japanese,
           sentence: doc.data().sentence,
           translation: doc.data().translation,
-          createdAt: doc.data().createdAt
+          createdAt: doc.data().createdAt,
+          likeCount: doc.data().likeCount,
+          stockCount: doc.data().stockCount
         })
       });
       return res.json(words);
@@ -47,3 +49,34 @@ exports.createWord = (req, res) => {
     .catch(err => res.status(500).json({ error: err.code }));
 }
 
+exports.updateWord = (req, res) => {
+  const wordDocument = findWordDocument(req);
+
+  wordDocument
+    .get()
+    .then(doc => {
+      if (!doc.exists) {
+        return res.status(404).json({ message: 'Not found' });
+      } else if (doc.data().userName !== req.user.name) {
+        return res.status(403).json({ error: "This word does not belong to you"});
+      }
+      let updateWord = {
+        english: req.body.english,
+        japanese: req.body.japanese,
+        sentence: req.body.sentence,
+        translation: req.body.translation,
+        updatedAt: new Date().toISOString()
+      };
+      wordDocument
+        .update(updateWord)
+        .then(() => {
+          return res.json({ message: 'Word successfully updated' });
+        })
+        .catch(err => res.status(500).json({ error: err.code }));
+    })
+    .catch(err => {
+      console.error(err)
+      res.status(500).json({ error: err.code })
+    }
+      );
+}
