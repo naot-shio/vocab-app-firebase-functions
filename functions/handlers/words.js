@@ -74,9 +74,5 @@ exports.updateWord = (req, res) => {
         })
         .catch(err => res.status(500).json({ error: err.code }));
     })
-    .catch(err => {
-      console.error(err)
-      res.status(500).json({ error: err.code })
-    }
-      );
+    .catch(err => res.status(500).json({ error: err.code }));
 }
