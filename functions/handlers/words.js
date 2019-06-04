@@ -67,12 +67,10 @@ exports.updateWord = (req, res) => {
         translation: req.body.translation,
         updatedAt: new Date().toISOString()
       };
-      wordDocument
-        .update(updateWord)
-        .then(() => {
-          return res.json({ message: 'Word successfully updated' });
-        })
-        .catch(err => res.status(500).json({ error: err.code }));
+      return wordDocument.update(updateWord);
+    })
+    .then(() => {
+      return res.json({ message: 'Word successfully updated' });
     })
     .catch(err => res.status(500).json({ error: err.code }));
 }
