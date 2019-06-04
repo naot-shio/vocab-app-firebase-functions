@@ -8,7 +8,8 @@ const FBAuth = require('./utils/fbAuth');
 const { 
   getAllWords,
   createWord,
-  updateWord
+  updateWord,
+  deleteWord
 } = require('./handlers/words');
 
 const {
@@ -29,6 +30,7 @@ const {
 app.get('/words', getAllWords);
 app.post('/word', FBAuth, createWord);
 app.put('/word/:wordId', FBAuth, updateWord)
+app.delete('/word/:wordId', FBAuth, deleteWord)
 app.get('/word/:wordId/like', FBAuth, likeWord);
 app.get('/word/:wordId/unlike', FBAuth, unlikeWord);
 app.get('/word/:wordId/stock', FBAuth, stockWord);

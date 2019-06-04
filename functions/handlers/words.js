@@ -76,3 +76,22 @@ exports.updateWord = (req, res) => {
     })
     .catch(err => res.status(500).json({ error: err.code }));
 }
+
+exports.deleteWord = (req, res) => {
+  const wordDocument = findWordDocument(req);
+
+  wordDocument
+    .get()
+    .then(doc => {
+      if (!doc.exists) {
+        return res.status(404).json({ message: 'Not found' });
+      } else if (doc.data().userName !== req.user.name) {
+        return res.status(403).json({ error: "This word does not belong to you"});
+      }
+      return wordDocument.delete()
+    })
+    .then(() => {
+      res.json({ message: 'Successfully deleted'})
+    })
+    .catch(err => res.status(500).json({ error: err.code }));
+}
