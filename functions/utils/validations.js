@@ -1,4 +1,3 @@
-let errors = {};
 const messageForNoInput = 'Must be filled in';
 
 const notFilledIn = (string) => {
@@ -12,7 +11,7 @@ const isValidEmailAddress = (email) => {
   return false;
 }
 
-const emailValidation = (user) => {
+const emailValidation = (user, errors) => {
   if (notFilledIn(user.email)) {
     errors.email = messageForNoInput
   } else if (!isValidEmailAddress(user.email)) {
@@ -20,14 +19,16 @@ const emailValidation = (user) => {
   };
 }
 
-const passwordValidation = (user) => {
+const passwordValidation = (user, errors) => {
   if (notFilledIn(user.password)) errors.password = messageForNoInput;
   if (user.password.length < 6) errors.password = 'Password must be at least 6 characters'
 }
 
 exports.signUpValidator = (data) => {
-  emailValidation(data);
-  passwordValidation(data);
+  let errors = {};
+
+  emailValidation(data, errors);
+  passwordValidation(data, errors);
 
   if (data.password !== data.confirmPassword) errors.confirmPassword = 'Password confirmation does not match with password';
   if (notFilledIn(data.name)) errors.name = messageForNoInput;
@@ -38,9 +39,11 @@ exports.signUpValidator = (data) => {
   }
 }
 
-exports.loginValidator = (data) => {  
-  emailValidation(data);
-  passwordValidation(data);
+exports.loginValidator = (data) => {
+  let errors = {};
+
+  emailValidation(data, errors);
+  passwordValidation(data, errors);
 
   return { 
     errors,
