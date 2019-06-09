@@ -4,7 +4,7 @@ exports.findLikeDocument = (req) => {
   return db
     .collection('likes')
     .where('userName', '==', req.user.name)
-    .where('wordId', '==', req.params.wordId)
+    .where('sentenceId', '==', req.params.sentenceId)
     .limit(1);
 }
 
@@ -12,8 +12,8 @@ exports.findStockDocument = (req) => {
   return db
     .collection('stocks')
     .where('userName', '==', req.user.name)
-    .where('wordId', '==', req.params.wordId)
+    .where('sentenceId', '==', req.params.sentenceId)
     .limit(1);
 }
 
-exports.findWordDocument = (req) => db.doc(`/words/${req.params.wordId}`);
+exports.findSentenceDocument = (req) => db.doc(`/sentences/${req.params.sentenceId}`);

@@ -1,16 +1,16 @@
 const { db } = require('../utils/admin')
-const { findWordDocument } = require('../utils/dbDocument')
+const { findSentenceDocument } = require('../utils/dbDocument')
 
-exports.getAllWords = (req, res) => {
+exports.getAllSentences = (req, res) => {
   db
-    .collection('words')
+    .collection('sentences')
     .orderBy('createdAt', 'desc')
     .get()
     .then(data => {
-      let words = [];
+      let sentences = [];
       data.forEach(doc => {
-        words.push({
-          wordId: doc.id,
+        sentences.push({
+          sentenceId: doc.id,
           userName: doc.data().userName,
           english: doc.data().english,
           japanese: doc.data().japanese,
@@ -21,13 +21,13 @@ exports.getAllWords = (req, res) => {
           stockCount: doc.data().stockCount
         })
       });
-      return res.json(words);
+      return res.json(sentences);
     })
     .catch(err => res.status(500).json(err));
 }
 
-exports.createWord = (req, res) => {
-  const newWord = {
+exports.createSentence = (req, res) => {
+  const newSentence = {
     userName: req.user.name,
     english: req.body.english,
     japanese: req.body.japanese,
@@ -39,54 +39,54 @@ exports.createWord = (req, res) => {
   };
   
   db
-    .collection('words')
-    .add(newWord)
+    .collection('sentences')
+    .add(newSentence)
     .then(doc => {
-      const word = newWord;
-      word.wordId = doc.id;
-      res.json(word);
+      const sentence = newSentence;
+      sentence.sentenceId = doc.id;
+      res.json(sentence);
     })
     .catch(err => res.status(500).json({ error: err.code }));
 }
 
-exports.updateWord = (req, res) => {
-  const wordDocument = findWordDocument(req);
+exports.updateSentence = (req, res) => {
+  const sentenceDocument = findSentenceDocument(req);
 
-  wordDocument
+  sentenceDocument
     .get()
     .then(doc => {
       if (!doc.exists) {
         return res.status(404).json({ message: 'Not found' });
       } else if (doc.data().userName !== req.user.name) {
-        return res.status(403).json({ error: "This word does not belong to you"});
+        return res.status(403).json({ error: "This sentence does not belong to you"});
       }
-      let updateWord = {
+      let updateSentence = {
         english: req.body.english,
         japanese: req.body.japanese,
         sentence: req.body.sentence,
         translation: req.body.translation,
         updatedAt: new Date().toISOString()
       };
-      return wordDocument.update(updateWord);
+      return sentenceDocument.update(updateSentence);
     })
     .then(() => {
-      return res.json({ message: 'Word successfully updated' });
+      return res.json({ message: 'sentence successfully updated' });
     })
     .catch(err => res.status(500).json({ error: err.code }));
 }
 
-exports.deleteWord = (req, res) => {
-  const wordDocument = findWordDocument(req);
+exports.deleteSentence = (req, res) => {
+  const sentenceDocument = findSentenceDocument(req);
 
-  wordDocument
+  sentenceDocument
     .get()
     .then(doc => {
       if (!doc.exists) {
         return res.status(404).json({ message: 'Not found' });
       } else if (doc.data().userName !== req.user.name) {
-        return res.status(403).json({ error: "This word does not belong to you"});
+        return res.status(403).json({ error: "This sentence does not belong to you"});
       }
-      return wordDocument.delete()
+      return sentenceDocument.delete()
     })
     .then(() => {
       res.json({ message: 'Successfully deleted'})
