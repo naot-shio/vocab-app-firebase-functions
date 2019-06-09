@@ -45,6 +45,34 @@ exports.createSentence = (req, res) => {
     .catch(err => res.status(500).json({ error: err.code }));
 }
 
+exports.createWords = (req, res) => {
+  const newWord = {
+    word: req.body.word,
+    meaning: req.body.meaning,
+    sentenceId: req.params.sentenceId,
+    createdAt: new Date().toISOString(),
+    userName: req.user.name
+  };
+
+  db
+    .doc(`/sentences/${req.params.sentenceId}`)
+    .get()
+    .then(doc => {
+      if(!doc.exists) 
+        return res.status(404).json({ error: 'Sentence not found'});
+      return db
+              .collection('words')
+              .add(newWord)
+    })
+    .then(() => {
+      res.json(newWord)
+    })
+    .catch(err => {
+      console.log(err);
+      res.status(500).json({ error: 'Something went wrong'});
+    })
+}
+
 exports.updateSentence = (req, res) => {
   const sentenceDocument = findSentenceDocument(req);
 
