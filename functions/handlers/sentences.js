@@ -12,8 +12,6 @@ exports.getAllSentences = (req, res) => {
         sentences.push({
           sentenceId: doc.id,
           userName: doc.data().userName,
-          english: doc.data().english,
-          japanese: doc.data().japanese,
           sentence: doc.data().sentence,
           translation: doc.data().translation,
           createdAt: doc.data().createdAt,
@@ -29,8 +27,6 @@ exports.getAllSentences = (req, res) => {
 exports.createSentence = (req, res) => {
   const newSentence = {
     userName: req.user.name,
-    english: req.body.english,
-    japanese: req.body.japanese,
     sentence: req.body.sentence,
     translation: req.body.translation,
     createdAt: new Date().toISOString(),
