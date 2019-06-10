@@ -14,6 +14,8 @@ exports.getAllSentences = (req, res) => {
           userName: doc.data().userName,
           sentence: doc.data().sentence,
           translation: doc.data().translation,
+          words: doc.data().words,
+          meanings: doc.data().meanings,
           createdAt: doc.data().createdAt,
           likeCount: doc.data().likeCount,
           stockCount: doc.data().stockCount
