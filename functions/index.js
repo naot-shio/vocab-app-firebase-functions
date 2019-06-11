@@ -10,7 +10,7 @@ const { db } = require('./utils/admin');
 const { 
   getAllSentences,
   createSentence,
-  createWords,
+  getSentence,
   updateSentence,
   deleteSentence
 } = require('./handlers/sentences');
@@ -32,6 +32,7 @@ const {
 // sentence routes
 app.get('/sentences', getAllSentences);
 app.post('/sentence', FBAuth, createSentence);
+app.get('/sentence/:sentenceId', getSentence);
 app.put('/sentence/:sentenceId', FBAuth, updateSentence);
 app.delete('/sentence/:sentenceId', FBAuth, deleteSentence)
 app.get('/sentence/:sentenceId/like', FBAuth, likeSentence);
