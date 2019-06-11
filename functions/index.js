@@ -33,7 +33,6 @@ const {
 app.get('/sentences', getAllSentences);
 app.post('/sentence', FBAuth, createSentence);
 app.put('/sentence/:sentenceId', FBAuth, updateSentence);
-app.post('/sentence/:sentenceId/word', FBAuth, createWords)
 app.delete('/sentence/:sentenceId', FBAuth, deleteSentence)
 app.get('/sentence/:sentenceId/like', FBAuth, likeSentence);
 app.get('/sentence/:sentenceId/unlike', FBAuth, unlikeSentence);

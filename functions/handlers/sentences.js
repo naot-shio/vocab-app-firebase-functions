@@ -15,7 +15,6 @@ exports.getAllSentences = (req, res) => {
           sentence: doc.data().sentence,
           translation: doc.data().translation,
           words: doc.data().words,
-          meanings: doc.data().meanings,
           createdAt: doc.data().createdAt,
           likeCount: doc.data().likeCount,
           stockCount: doc.data().stockCount
@@ -31,6 +30,7 @@ exports.createSentence = (req, res) => {
     userName: req.user.name,
     sentence: req.body.sentence,
     translation: req.body.translation,
+    words: req.body.words,
     createdAt: new Date().toISOString(),
     likeCount: 0,
     stockCount: 0
@@ -45,34 +45,6 @@ exports.createSentence = (req, res) => {
       res.json(sentence);
     })
     .catch(err => res.status(500).json({ error: err.code }));
-}
-
-exports.createWords = (req, res) => {
-  const newWord = {
-    word: req.body.word,
-    meaning: req.body.meaning,
-    sentenceId: req.params.sentenceId,
-    createdAt: new Date().toISOString(),
-    userName: req.user.name
-  };
-
-  db
-    .doc(`/sentences/${req.params.sentenceId}`)
-    .get()
-    .then(doc => {
-      if(!doc.exists) 
-        return res.status(404).json({ error: 'Sentence not found'});
-      return db
-              .collection('words')
-              .add(newWord)
-    })
-    .then(() => {
-      res.json(newWord)
-    })
-    .catch(err => {
-      console.log(err);
-      res.status(500).json({ error: 'Something went wrong'});
-    })
 }
 
 exports.updateSentence = (req, res) => {
