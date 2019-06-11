@@ -76,8 +76,7 @@ exports.updateSentence = (req, res) => {
         return res.status(403).json({ error: "This sentence does not belong to you"});
       }
       let updateSentence = {
-        english: req.body.english,
-        japanese: req.body.japanese,
+        words: req.body.words,
         sentence: req.body.sentence,
         translation: req.body.translation,
         updatedAt: new Date().toISOString()
@@ -87,7 +86,9 @@ exports.updateSentence = (req, res) => {
     .then(() => {
       return res.json({ message: 'sentence successfully updated' });
     })
-    .catch(err => res.status(500).json({ error: err.code }));
+    .catch(err => 
+      res.json({ error: err.code })
+    );
 }
 
 exports.deleteSentence = (req, res) => {
