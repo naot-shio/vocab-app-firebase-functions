@@ -2,9 +2,10 @@ const { db } = require('../utils/admin')
 const { findSentenceDocument } = require('../utils/dbDocument')
 
 exports.getAllSentences = (req, res) => {
+  const n = parseInt(res.socket._httpMessage.req.query.limit)
   db
     .collection('sentences')
-    .orderBy('createdAt', 'desc')
+    .limit(n)
     .get()
     .then(data => {
       let sentences = [];
@@ -42,7 +43,7 @@ exports.getSentence = (req, res) => {
     .catch(err => console.error(err))
 }
 
-exports.createSentence = (req, res) => {
+exports.createSentence = (req, res) => {  
   const newSentence = {
     userName: req.user.name,
     sentence: req.body.sentence,
