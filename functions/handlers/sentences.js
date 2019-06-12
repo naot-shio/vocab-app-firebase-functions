@@ -2,7 +2,6 @@ const { db } = require('../utils/admin')
 const { findSentenceDocument } = require('../utils/dbDocument')
 
 exports.getAllSentences = (req, res) => {
-  const n = parseInt(res.socket._httpMessage.req.query.limit)
   db
     .collection('sentences')
     .orderBy('createdAt', 'asc')
@@ -10,7 +9,8 @@ exports.getAllSentences = (req, res) => {
     .then(data => {
       let sentences = [];
       data.forEach(doc => {
-        if (doc.data().sentence.includes(res.socket._httpMessage.req.query.keyword)) {
+        let searchedKeyword = res.socket._httpMessage.req.query.keyword.toLowerCase()
+        if (doc.data().sentence.toLowerCase().includes(searchedKeyword)) {
           let stock = {
             sentenceId: doc.id,
             userName: doc.data().userName,
@@ -24,6 +24,7 @@ exports.getAllSentences = (req, res) => {
           sentences.push(stock)
         }
       });
+  
       return res.json(sentences);
     })
     .catch(err => res.status(500).json(err));
