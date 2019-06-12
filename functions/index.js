@@ -8,18 +8,19 @@ const FBAuth = require('./utils/fbAuth');
 const { db } = require('./utils/admin');
 
 const { 
-  getAllWords,
-  createWord,
-  updateWord,
-  deleteWord
-} = require('./handlers/words');
+  getAllSentences,
+  createSentence,
+  getSentence,
+  updateSentence,
+  deleteSentence
+} = require('./handlers/sentences');
 
 const {
-  likeWord,
-  unlikeWord,
-  stockWord,
-  unstockWord
-} = require('./handlers/likesStocksWords')
+  likeSentence,
+  unlikeSentence,
+  stockSentence,
+  unstockSentence
+} = require('./handlers/likesStocksSentences')
 
 const { 
   signUp,
@@ -28,15 +29,19 @@ const {
   getOwnDetails
 } = require('./handlers/users');
 
+// sentence routes
+app.get('/sentences', getAllSentences);
+app.post('/sentence', FBAuth, createSentence);
+app.get('/sentence/:sentenceId', getSentence);
+app.put('/sentence/:sentenceId', FBAuth, updateSentence);
+app.delete('/sentence/:sentenceId', FBAuth, deleteSentence)
+app.get('/sentence/:sentenceId/like', FBAuth, likeSentence);
+app.get('/sentence/:sentenceId/unlike', FBAuth, unlikeSentence);
+app.get('/sentence/:sentenceId/stock', FBAuth, stockSentence);
+app.get('/sentence/:sentenceId/unstock', FBAuth, unstockSentence);
+
 // word routes
-app.get('/words', getAllWords);
-app.post('/word', FBAuth, createWord);
-app.put('/word/:wordId', FBAuth, updateWord)
-app.delete('/word/:wordId', FBAuth, deleteWord)
-app.get('/word/:wordId/like', FBAuth, likeWord);
-app.get('/word/:wordId/unlike', FBAuth, unlikeWord);
-app.get('/word/:wordId/stock', FBAuth, stockWord);
-app.get('/word/:wordId/unstock', FBAuth, unstockWord);
+app.get('/words', )
 
 // user routes
 app.post('/signup', signUp);
@@ -46,16 +51,16 @@ app.get('/user', FBAuth, getOwnDetails);
 
 exports.api = functions.region('asia-northeast1').https.onRequest(app);
 
-exports.onDeletingWord = functions
+exports.onDeletingSentence = functions
   .region('asia-northeast1')
   .firestore
-  .document('/words/{wordId}')
+  .document('/sentences/{sentenceId}')
   .onDelete((snapshot, context) => {
-    const wordId = context.params.wordId;
+    const sentenceId = context.params.sentenceId;
     const batch = db.batch();
     return db
       .collection('likes')
-      .where('wordId', '==', wordId)
+      .where('sentenceId', '==', sentenceId)
       .get()
       .then(data => {
         data.forEach(doc => {
@@ -63,7 +68,7 @@ exports.onDeletingWord = functions
         });
         return db
           .collection('stocks')
-          .where('wordId', '==', wordId)
+          .where('sentenceId', '==', sentenceId)
           .get()
       })
       .then(data => {

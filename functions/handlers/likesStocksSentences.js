@@ -1,17 +1,17 @@
 const { db } = require('../utils/admin')
-const { findLikeDocument, findWordDocument, findStockDocument } = require('../utils/dbDocument')
+const { findLikeDocument, findSentenceDocument, findStockDocument } = require('../utils/dbDocument')
 
-exports.likeWord = (req, res) => {
+exports.likeSentence = (req, res) => {
   const likeDocument = findLikeDocument(req);
-  const wordDocument = findWordDocument(req);
-  let wordData = {};
+  const sentenceDocument = findSentenceDocument(req);
+  let sentenceData = {};
 
-  wordDocument
+  sentenceDocument
     .get()
     .then(doc => {
       if (doc.exists) {
-        wordData = doc.data();
-        wordData.wordId = doc.id;
+        sentenceData = doc.data();
+        sentenceData.sentenceId = doc.id;
         return likeDocument.get();
       }
       return res.status(404).json({ error: 'Not Found' });
@@ -21,31 +21,31 @@ exports.likeWord = (req, res) => {
       if (data.empty) return db
         .collection('likes')
         .add({
-          wordId: req.params.wordId,
+          sentenceId: req.params.sentenceId,
           userName: req.user.name
         })
         .then(() => {
-          wordData.likeCount++;
-          return wordDocument.update({ likeCount: wordData.likeCount });
+          sentenceData.likeCount++;
+          return sentenceDocument.update({ likeCount: sentenceData.likeCount });
         })
-        .then(() => res.json(wordData))
+        .then(() => res.json(sentenceData))
         .catch(err => res.status(500).json({ error: err.code }));
       return res.status(400).json({ error: 'Already liked'});
     })
     .catch(err => res.status(500).json({ error: err.code }));
 }
 
-exports.unlikeWord = (req, res) => {
+exports.unlikeSentence = (req, res) => {
   const likeDocument = findLikeDocument(req);
-  const wordDocument = findWordDocument(req);
-  let wordData = {};
+  const sentenceDocument = findSentenceDocument(req);
+  let sentenceData = {};
 
-  wordDocument
+  sentenceDocument
     .get()
     .then(doc => {
       if (doc.exists) {
-        wordData = doc.data();
-        wordData.wordId = doc.id;
+        sentenceData = doc.data();
+        sentenceData.sentenceId = doc.id;
         return likeDocument.get();
       }
       return res.status(404).json({ error: 'Not Found' });
@@ -55,10 +55,10 @@ exports.unlikeWord = (req, res) => {
         .doc(`likes/${data.docs[0].id}`)
         .delete()
         .then(() => {
-          wordData.likeCount--;
-          return wordDocument.update({ likeCount: wordData.likeCount });
+          sentenceData.likeCount--;
+          return sentenceDocument.update({ likeCount: sentenceData.likeCount });
         })
-        .then(() => res.json(wordData))
+        .then(() => res.json(sentenceData))
         .catch(err => res.status(500).json({ error: err.code }));
 
       return res.status(400).json({ error: 'Has not been liked'});
@@ -66,17 +66,17 @@ exports.unlikeWord = (req, res) => {
     .catch(err => res.status(500).json({ error: err.code }));
 }
 
-exports.stockWord = (req, res) => {
+exports.stockSentence = (req, res) => {
   const stockDocument = findStockDocument(req);
-  const wordDocument = findWordDocument(req);
-  let wordData = {};
+  const sentenceDocument = findSentenceDocument(req);
+  let sentenceData = {};
 
-  wordDocument
+  sentenceDocument
     .get()
     .then(doc => {
       if (doc.exists) {
-        wordData = doc.data();
-        wordData.wordId = doc.id;
+        sentenceData = doc.data();
+        sentenceData.sentenceId = doc.id;
         return stockDocument.get();
       }
       return res.status(404).json({ error: 'Not Found' });
@@ -86,31 +86,31 @@ exports.stockWord = (req, res) => {
       if (data.empty) return db
         .collection('stocks')
         .add({
-          wordId: req.params.wordId,
+          sentenceId: req.params.sentenceId,
           userName: req.user.name
         })
         .then(() => {
-          wordData.stockCount++;
-          return wordDocument.update({ stockCount: wordData.stockCount });
+          sentenceData.stockCount++;
+          return sentenceDocument.update({ stockCount: sentenceData.stockCount });
         })
-        .then(() => res.json(wordData))
+        .then(() => res.json(sentenceData))
         .catch(err => res.status(500).json({ error: err.code }));
       return res.status(400).json({ error: 'Already stocked'});
     })
     .catch(err => res.status(500).json({ error: err.code }));
 }
 
-exports.unstockWord = (req, res) => {
+exports.unstockSentence = (req, res) => {
   const stockDocument = findStockDocument(req);
-  const wordDocument = findWordDocument(req);
-  let wordData = {};
+  const sentenceDocument = findSentenceDocument(req);
+  let sentenceData = {};
 
-  wordDocument
+  sentenceDocument
     .get()
     .then(doc => {
       if (doc.exists) {
-        wordData = doc.data();
-        wordData.wordId = doc.id;
+        sentenceData = doc.data();
+        sentenceData.sentenceId = doc.id;
         return stockDocument.get();
       }
       return res.status(404).json({ error: 'Not Found' });
@@ -120,10 +120,10 @@ exports.unstockWord = (req, res) => {
         .doc(`stocks/${data.docs[0].id}`)
         .delete()
         .then(() => {
-          wordData.stockCount--;
-          return wordDocument.update({ stockCount: wordData.stockCount });
+          sentenceData.stockCount--;
+          return sentenceDocument.update({ stockCount: sentenceData.stockCount });
         })
-        .then(() => res.json(wordData))
+        .then(() => res.json(sentenceData))
         .catch(err => res.status(500).json({ error: err.code }));
 
       return res.status(400).json({ error: 'Has not been stocked'});
