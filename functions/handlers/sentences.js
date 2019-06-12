@@ -5,21 +5,24 @@ exports.getAllSentences = (req, res) => {
   const n = parseInt(res.socket._httpMessage.req.query.limit)
   db
     .collection('sentences')
-    .limit(n)
+    .orderBy('createdAt', 'asc')
     .get()
     .then(data => {
       let sentences = [];
       data.forEach(doc => {
-        sentences.push({
-          sentenceId: doc.id,
-          userName: doc.data().userName,
-          sentence: doc.data().sentence,
-          translation: doc.data().translation,
-          words: doc.data().words,
-          createdAt: doc.data().createdAt,
-          likeCount: doc.data().likeCount,
-          stockCount: doc.data().stockCount
-        })
+        if (doc.data().sentence.includes(res.socket._httpMessage.req.query.keyword)) {
+          let stock = {
+            sentenceId: doc.id,
+            userName: doc.data().userName,
+            sentence: doc.data().sentence,
+            translation: doc.data().translation,
+            words: doc.data().words,
+            createdAt: doc.data().createdAt,
+            likeCount: doc.data().likeCount,
+            stockCount: doc.data().stockCount
+          }
+          sentences.push(stock)
+        }
       });
       return res.json(sentences);
     })
