@@ -4,22 +4,27 @@ const { findSentenceDocument } = require('../utils/dbDocument')
 exports.getAllSentences = (req, res) => {
   db
     .collection('sentences')
-    .orderBy('createdAt', 'desc')
+    .orderBy('createdAt', 'asc')
     .get()
     .then(data => {
       let sentences = [];
       data.forEach(doc => {
-        sentences.push({
-          sentenceId: doc.id,
-          userName: doc.data().userName,
-          sentence: doc.data().sentence,
-          translation: doc.data().translation,
-          words: doc.data().words,
-          createdAt: doc.data().createdAt,
-          likeCount: doc.data().likeCount,
-          stockCount: doc.data().stockCount
-        })
+        let searchedKeyword = res.socket._httpMessage.req.query.keyword.toLowerCase()
+        if (doc.data().sentence.toLowerCase().includes(searchedKeyword)) {
+          let stock = {
+            sentenceId: doc.id,
+            userName: doc.data().userName,
+            sentence: doc.data().sentence,
+            translation: doc.data().translation,
+            words: doc.data().words,
+            createdAt: doc.data().createdAt,
+            likeCount: doc.data().likeCount,
+            stockCount: doc.data().stockCount
+          }
+          sentences.push(stock)
+        }
       });
+  
       return res.json(sentences);
     })
     .catch(err => res.status(500).json(err));
@@ -42,7 +47,7 @@ exports.getSentence = (req, res) => {
     .catch(err => console.error(err))
 }
 
-exports.createSentence = (req, res) => {
+exports.createSentence = (req, res) => {  
   const newSentence = {
     userName: req.user.name,
     sentence: req.body.sentence,
