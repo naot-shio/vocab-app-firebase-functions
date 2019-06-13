@@ -86,7 +86,7 @@ exports.getOwnDetails = (req, res) => {
       if (doc.exists) {
         userData.credentials = doc.data();
         return db
-          .collection('stocks', 'likes')
+          .collection('likes')
           .where('userName', '==', req.user.name)
           .get();
       }

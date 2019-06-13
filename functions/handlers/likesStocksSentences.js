@@ -17,7 +17,6 @@ exports.likeSentence = (req, res) => {
       return res.status(404).json({ error: 'Not Found' });
     })
     .then(data => {
-      console.log(data)
       if (data.empty) return db
         .collection('likes')
         .add({
