@@ -4,7 +4,7 @@ const { findLikeDocument, findSentenceDocument, findStockDocument } = require('.
 exports.likeSentence = (req, res) => {
   const likeDocument = findLikeDocument(req);
   const sentenceDocument = findSentenceDocument(req);
-  let sentenceData = {};
+  let sentenceData;
 
   sentenceDocument
     .get()
@@ -38,7 +38,7 @@ exports.likeSentence = (req, res) => {
 exports.unlikeSentence = (req, res) => {
   const likeDocument = findLikeDocument(req);
   const sentenceDocument = findSentenceDocument(req);
-  let sentenceData = {};
+  let sentenceData;
 
   sentenceDocument
     .get()

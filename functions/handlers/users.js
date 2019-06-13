@@ -13,7 +13,7 @@ exports.signUp = (req, res) => {
     email: req.body.email,
     password: req.body.password,
     confirmPassword: req.body.confirmPassword,
-    name: req.body.name
+    name: req.body.name,
   };
 
   const {valid, errors} = signUpValidator(newUser);
@@ -95,7 +95,7 @@ exports.getOwnDetails = (req, res) => {
       userData.stocks = [];
       userData.likes = [];
       data.forEach(doc => {
-        userData.stocks.push(doc.data())
+        userData.likes.push(doc.data())
       })
       return res.json(userData);
     })
