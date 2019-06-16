@@ -21,6 +21,7 @@ module.exports = (req, res, next) => {
     })
     .then(data => {
       req.user.name = data.docs[0].data().name;
+      req.user.owner = data.docs[0].data().owner;
       return next();
     })
     .catch(err => {
