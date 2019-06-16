@@ -48,25 +48,28 @@ exports.getSentence = (req, res) => {
 }
 
 exports.createSentence = (req, res) => {  
-  const newSentence = {
-    userName: req.user.name,
-    sentence: req.body.sentence,
-    translation: req.body.translation,
-    words: req.body.words,
-    createdAt: new Date().toISOString(),
-    likeCount: 0,
-    stockCount: 0
-  };
-  
-  db
-    .collection('sentences')
-    .add(newSentence)
-    .then(doc => {
-      const sentence = newSentence;
-      sentence.sentenceId = doc.id;
-      res.json(sentence);
-    })
-    .catch(err => res.status(500).json({ error: err.code }));
+  if (req.user.owner) {
+    const newSentence = {
+      userName: req.user.name,
+      sentence: req.body.sentence,
+      translation: req.body.translation,
+      words: req.body.words,
+      createdAt: new Date().toISOString(),
+      likeCount: 0,
+      stockCount: 0
+    };
+    db
+      .collection('sentences')
+      .add(newSentence)
+      .then(doc => {
+        const sentence = newSentence;
+        sentence.sentenceId = doc.id;
+        res.json(sentence);
+      })
+      .catch(err => {res.status(500).json({ error: err.code }), console.log(err)});
+  } else {
+    console.log('You gotta be an owner to create a sentence')
+  }
 }
 
 exports.updateSentence = (req, res) => {
