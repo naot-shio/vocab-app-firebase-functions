@@ -10,7 +10,7 @@ const imageUrl = (imageFile) => `https://firebasestorage.googleapis.com/v0/b/${c
 
 exports.signUp = (req, res) => {
   const newUser = {
-    email: req.body.email,
+    email: req.body.email.toLowerCase(),
     password: req.body.password,
     confirmPassword: req.body.confirmPassword,
     name: req.body.name,
@@ -58,7 +58,7 @@ exports.signUp = (req, res) => {
 
 exports.login = (req, res) => {
   const user = {
-    email: req.body.email, 
+    email: req.body.email.toLowerCase(), 
     password: req.body.password 
   };
 
