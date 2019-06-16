@@ -42,7 +42,8 @@ exports.signUp = (req, res) => {
         email: newUser.email,
         createdAt: new Date().toISOString(),
         imageUrl: imageUrl(initialProfile),
-        userId
+        owner: false,
+        userId 
       };
       return db.doc(`/users/${newUser.name}`).set(userCredentials);
     })
