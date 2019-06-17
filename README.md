@@ -5,17 +5,21 @@
 ## Frontend Github
 https://github.com/naot-shio/vocab-app-firebase-frontend
 
-## 主な機能
+## 主な機能 main functionalities 
+
+- Basic CRUD functionalities
+
+- Authentication
+
+- Likes/Unlies functionalities
+
 - Deploy
   - Firebase functions
   
 - Image Upload
-  - busbo
+  - busboy
 
-- Cross origin resource sharing
- - cors
-
-## Requirement
+## Requirements
 
 - npm 6.9.0
 - node 8 or 10
