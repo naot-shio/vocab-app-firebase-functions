@@ -93,7 +93,6 @@ exports.getOwnDetails = (req, res) => {
       }
     })
     .then(data => {
-      userData.stocks = [];
       userData.likes = [];
       data.forEach(doc => {
         userData.likes.push(doc.data())

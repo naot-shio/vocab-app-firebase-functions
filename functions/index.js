@@ -17,10 +17,8 @@ const {
 
 const {
   likeSentence,
-  unlikeSentence,
-  stockSentence,
-  unstockSentence
-} = require('./handlers/likesStocksSentences')
+  unlikeSentence
+} = require('./handlers/likeUnlikeSentences')
 
 const { 
   signUp,
@@ -37,11 +35,6 @@ app.put('/sentence/:sentenceId', FBAuth, updateSentence);
 app.delete('/sentence/:sentenceId', FBAuth, deleteSentence)
 app.get('/sentence/:sentenceId/like', FBAuth, likeSentence);
 app.get('/sentence/:sentenceId/unlike', FBAuth, unlikeSentence);
-app.get('/sentence/:sentenceId/stock', FBAuth, stockSentence);
-app.get('/sentence/:sentenceId/unstock', FBAuth, unstockSentence);
-
-// word routes
-app.get('/words', )
 
 // user routes
 app.post('/signup', signUp);
@@ -65,15 +58,6 @@ exports.onDeletingSentence = functions
       .then(data => {
         data.forEach(doc => {
           batch.delete(db.doc(`/likes/${doc.id}`));
-        });
-        return db
-          .collection('stocks')
-          .where('sentenceId', '==', sentenceId)
-          .get()
-      })
-      .then(data => {
-        data.forEach(doc => {
-          batch.delete(db.doc(`/stocks/${doc.id}`));
         });
         return batch.commit();
       })

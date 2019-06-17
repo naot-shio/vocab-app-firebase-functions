@@ -11,7 +11,7 @@ exports.getAllSentences = (req, res) => {
       data.forEach(doc => {
         let searchedKeyword = res.socket._httpMessage.req.query.keyword.toLowerCase()
         if (doc.data().sentence.toLowerCase().includes(searchedKeyword)) {
-          let stock = {
+          let sentence = {
             sentenceId: doc.id,
             userName: doc.data().userName,
             sentence: doc.data().sentence,
@@ -19,9 +19,8 @@ exports.getAllSentences = (req, res) => {
             words: doc.data().words,
             createdAt: doc.data().createdAt,
             likeCount: doc.data().likeCount,
-            stockCount: doc.data().stockCount
           }
-          sentences.push(stock)
+          sentences.push(sentence)
         }
       });
   
@@ -55,8 +54,7 @@ exports.createSentence = (req, res) => {
       translation: req.body.translation,
       words: req.body.words,
       createdAt: new Date().toISOString(),
-      likeCount: 0,
-      stockCount: 0
+      likeCount: 0
     };
     db
       .collection('sentences')
