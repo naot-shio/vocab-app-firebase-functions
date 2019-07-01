@@ -1,11 +1,12 @@
-const { db } = require('./admin'); 
+const { db } = require("./admin");
 
-exports.findLikeDocument = (req) => {
+exports.findLikeDocument = req => {
   return db
-    .collection('likes')
-    .where('userName', '==', req.user.name)
-    .where('sentenceId', '==', req.params.sentenceId)
+    .collection("likes")
+    .where("userName", "==", req.user.name)
+    .where("sentenceId", "==", req.params.sentenceId)
     .limit(1);
-}
+};
 
-exports.findSentenceDocument = (req) => db.doc(`/sentences/${req.params.sentenceId}`);
+exports.findSentenceDocument = req =>
+  db.doc(`/sentences/${req.params.sentenceId}`);
