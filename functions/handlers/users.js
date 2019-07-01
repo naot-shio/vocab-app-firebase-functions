@@ -77,8 +77,11 @@ exports.login = (req, res) => {
       return res.json({ token });
     })
     .catch(err => {
-      if (err.code === "auth/user-not-found")
+      if (err.code === "auth/user-not-found") {
         return res.status(403).json({ general: "User not found" });
+      } else if (err.code === "auth/wrong-password") {
+        return res.status(403).json({ general: "Your email and password do not match" });
+      }
       return res.status(500).json({ error: err.code });
     });
 };
@@ -104,7 +107,6 @@ exports.getOwnDetails = (req, res) => {
       return res.json(userData);
     })
     .catch(err => {
-      console.error(err);
       return res.status(500).json({ error: err.code });
     });
 };
