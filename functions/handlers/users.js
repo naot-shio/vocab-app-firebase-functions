@@ -80,7 +80,9 @@ exports.login = (req, res) => {
       if (err.code === "auth/user-not-found") {
         return res.status(403).json({ general: "User not found" });
       } else if (err.code === "auth/wrong-password") {
-        return res.status(403).json({ general: "Your email and password do not match" });
+        return res
+          .status(403)
+          .json({ general: "Your email and password do not match" });
       }
       return res.status(500).json({ error: err.code });
     });
