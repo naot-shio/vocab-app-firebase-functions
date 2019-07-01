@@ -1,5 +1,8 @@
-const { db } = require('../utils/admin')
-const { findLikeDocument, findSentenceDocument } = require('../utils/dbDocument')
+const { db } = require("../utils/admin");
+const {
+  findLikeDocument,
+  findSentenceDocument
+} = require("../utils/dbDocument");
 
 exports.likeSentence = (req, res) => {
   const likeDocument = findLikeDocument(req);
@@ -14,25 +17,28 @@ exports.likeSentence = (req, res) => {
         sentenceData.sentenceId = doc.id;
         return likeDocument.get();
       }
-      return res.status(404).json({ error: 'Not Found' });
+      return res.status(404).json({ error: "Not Found" });
     })
     .then(data => {
-      if (data.empty) return db
-        .collection('likes')
-        .add({
-          sentenceId: req.params.sentenceId,
-          userName: req.user.name
-        })
-        .then(() => {
-          sentenceData.likeCount++;
-          return sentenceDocument.update({ likeCount: sentenceData.likeCount });
-        })
-        .then(() => res.json(sentenceData))
-        .catch(err => res.status(500).json({ error: err.code }));
-      return res.status(400).json({ error: 'Already liked'});
+      if (data.empty)
+        return db
+          .collection("likes")
+          .add({
+            sentenceId: req.params.sentenceId,
+            userName: req.user.name
+          })
+          .then(() => {
+            sentenceData.likeCount++;
+            return sentenceDocument.update({
+              likeCount: sentenceData.likeCount
+            });
+          })
+          .then(() => res.json(sentenceData))
+          .catch(err => res.status(500).json({ error: err.code }));
+      return res.status(400).json({ error: "Already liked" });
     })
     .catch(err => res.status(500).json({ error: err.code }));
-}
+};
 
 exports.unlikeSentence = (req, res) => {
   const likeDocument = findLikeDocument(req);
@@ -47,20 +53,23 @@ exports.unlikeSentence = (req, res) => {
         sentenceData.sentenceId = doc.id;
         return likeDocument.get();
       }
-      return res.status(404).json({ error: 'Not Found' });
+      return res.status(404).json({ error: "Not Found" });
     })
     .then(data => {
-      if (!data.empty) return db
-        .doc(`likes/${data.docs[0].id}`)
-        .delete()
-        .then(() => {
-          sentenceData.likeCount--;
-          return sentenceDocument.update({ likeCount: sentenceData.likeCount });
-        })
-        .then(() => res.json(sentenceData))
-        .catch(err => res.status(500).json({ error: err.code }));
+      if (!data.empty)
+        return db
+          .doc(`likes/${data.docs[0].id}`)
+          .delete()
+          .then(() => {
+            sentenceData.likeCount--;
+            return sentenceDocument.update({
+              likeCount: sentenceData.likeCount
+            });
+          })
+          .then(() => res.json(sentenceData))
+          .catch(err => res.status(500).json({ error: err.code }));
 
-      return res.status(400).json({ error: 'Has not been liked'});
+      return res.status(400).json({ error: "Has not been liked" });
     })
     .catch(err => res.status(500).json({ error: err.code }));
-}
+};
