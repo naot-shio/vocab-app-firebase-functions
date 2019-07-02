@@ -115,12 +115,8 @@ exports.getRandomSentences = (req, res) => {
         if (doc.data().sentence) {
           let sentence = {
             sentenceId: doc.id,
-            userName: doc.data().userName,
             sentence: doc.data().sentence,
             translation: doc.data().translation,
-            words: doc.data().words,
-            createdAt: doc.data().createdAt,
-            likeCount: doc.data().likeCount
           };
           sentences.push(sentence);
         }
