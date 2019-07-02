@@ -115,18 +115,24 @@ exports.getRandomSentences = (req, res) => {
         if (doc.data().sentence) {
           let sentence = {
             sentenceId: doc.id,
+            userName: doc.data().userName,
             sentence: doc.data().sentence,
             translation: doc.data().translation,
+            words: doc.data().words,
+            createdAt: doc.data().createdAt,
+            likeCount: doc.data().likeCount
           };
           sentences.push(sentence);
         }
       });
 
+      let numberOfQuestions = parseInt(res.socket._httpMessage.req.query.numberOfQuestions)
+
       let randomSentences = [];
       let randomNumbers = [];
       let index = 0;
 
-      while (randomSentences.length < 5) {
+      while (randomSentences.length < numberOfQuestions) {
         let randomIndex = Math.floor(Math.random() * sentences.length);
         randomNumbers.push(randomIndex);
         if (randomNumbers.indexOf(randomIndex) === index) {
