@@ -128,6 +128,12 @@ exports.getRandomSentences = (req, res) => {
 
       let numberOfQuestions = parseInt(res.socket._httpMessage.req.query.numberOfQuestions)
 
+      // If the number of questions is higher than the number of sentences in database, it causes an error.
+      // And also if a user inputs like an astronomical value, the loop might not end and cause a problem. 
+      // And I don't think it would happen, but in case the number of questions would be a string, it crashes the app.
+      // So this swap the value in these cases.
+      if (numberOfQuestions > sentences.length || isNaN(numberOfQuestions)) numberOfQuestions = sentences.length
+
       let randomSentences = [];
       let randomNumbers = [];
       let index = 0;
