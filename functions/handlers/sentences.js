@@ -104,3 +104,55 @@ exports.deleteSentence = (req, res) => {
     })
     .catch(err => res.status(500).json({ error: err.code }));
 };
+
+exports.getRandomSentences = (req, res) => {
+  db.collection("sentences")
+    .orderBy("createdAt", "asc")
+    .get()
+    .then(data => {
+      let sentences = [];
+      data.forEach(doc => {
+        if (doc.data().sentence) {
+          let sentence = {
+            sentenceId: doc.id,
+            userName: doc.data().userName,
+            sentence: doc.data().sentence,
+            translation: doc.data().translation,
+            words: doc.data().words,
+            createdAt: doc.data().createdAt,
+            likeCount: doc.data().likeCount
+          };
+          sentences.push(sentence);
+        }
+      });
+
+      let numberOfQuestions = parseInt(
+        res.socket._httpMessage.req.query.numberOfQuestions
+      );
+
+      // If the number of questions is higher than the number of sentences in database, it causes an error.
+      // And also if a user inputs like an astronomical value, the loop might not end and cause a problem.
+      // And I don't think it would happen, but in case the number of questions would be a string, it crashes the app.
+      // So this swap the value in these cases.
+      if (numberOfQuestions > sentences.length || isNaN(numberOfQuestions))
+        numberOfQuestions = sentences.length;
+
+      let randomSentences = [];
+      let randomNumbers = [];
+      let index = 0;
+
+      while (randomSentences.length < numberOfQuestions) {
+        let randomIndex = Math.floor(Math.random() * sentences.length);
+        randomNumbers.push(randomIndex);
+        if (randomNumbers.indexOf(randomIndex) === index) {
+          randomSentences.push(sentences[randomIndex]);
+          index++;
+        } else {
+          randomNumbers.pop();
+        }
+      }
+
+      return res.json(randomSentences);
+    })
+    .catch(err => res.status(500).json(err));
+};
