@@ -32,6 +32,21 @@ exports.getAllSentences = (req, res) => {
     .catch(err => res.status(500).json(err));
 };
 
+exports.getSentence = (req, res) => {
+  db.doc(`/sentences/${req.params.sentenceId}`)
+    .get()
+    .then(doc => {
+      if (!doc.exists)
+        return res.status(404).json({ error: "Sentence not found" });
+
+      sentenceData = doc.data();
+      sentenceData.sentenceId = doc.id;
+
+      return res.json(sentenceData);
+    })
+    .catch(err => console.error(err));
+};
+
 exports.createSentence = (req, res) => {
   if (req.user.owner) {
     const newSentence = {
@@ -49,12 +64,11 @@ exports.createSentence = (req, res) => {
         sentence.sentenceId = doc.id;
         res.json(sentence);
       })
-      .catch(err => {
-        res.status(500).json({ error: err.code }), console.log(err);
-      });
-  } else {
-    console.log("You gotta be an owner to create a sentence");
+      .catch(err => res.status(500).json({ error: err.code }));
   }
+  return res
+    .status(400)
+    .json({ error: "You must be an owner to add vocabulary" });
 };
 
 exports.updateSentence = (req, res) => {
@@ -155,4 +169,27 @@ exports.getRandomSentences = (req, res) => {
       return res.json(randomSentences);
     })
     .catch(err => res.status(500).json(err));
+};
+
+exports.getLikedSentences = (req, res) => {
+  let sentences = [];
+  db.doc(`/users/${req.user.name}`)
+    .get()
+    .then(doc => {
+      if (doc.exists) {
+        return db
+          .collection("likes")
+          .where("userName", "==", req.user.name)
+          .get();
+      }
+    })
+    .then(data => {
+      data.forEach(doc => {
+        sentences.push(doc.data());
+      });
+      return res.json(sentences);
+    })
+    .catch(err => {
+      return res.status(500).json({ error: err.code });
+    });
 };

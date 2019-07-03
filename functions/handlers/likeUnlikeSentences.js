@@ -24,6 +24,9 @@ exports.likeSentence = (req, res) => {
         return db
           .collection("likes")
           .add({
+            sentence: sentenceData.sentence,
+            translation: sentenceData.translation,
+            words: sentenceData.words,
             sentenceId: req.params.sentenceId,
             userName: req.user.name
           })
