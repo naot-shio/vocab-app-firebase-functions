@@ -156,3 +156,27 @@ exports.getRandomSentences = (req, res) => {
     })
     .catch(err => res.status(500).json(err));
 };
+
+exports.getLikedSentences = (req, res) => {
+  let sentences = [];
+  db.doc(`/users/${req.user.name}`)
+    .get()
+    .then(doc => {
+      if (doc.exists) {
+        return db
+          .collection("likes")
+          .where("userName", "==", req.user.name)
+          .get();
+      }
+    })
+    .then(data => {
+      data.forEach(doc => {
+        sentences.push(doc.data());
+      });
+      console.log(sentences);
+      return res.json(sentences);
+    })
+    .catch(err => {
+      return res.status(500).json({ error: err.code });
+    });
+};

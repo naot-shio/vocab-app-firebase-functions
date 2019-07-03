@@ -11,7 +11,8 @@ const {
   createSentence,
   updateSentence,
   deleteSentence,
-  getRandomSentences
+  getRandomSentences,
+  getLikedSentences
 } = require("./handlers/sentences");
 
 const {
@@ -29,6 +30,7 @@ const {
 // sentence routes
 app.get("/sentences", getAllSentences);
 app.get("/quiz", getRandomSentences);
+app.get("/sentences/likes", FBAuth, getLikedSentences);
 app.post("/sentence", FBAuth, createSentence);
 app.put("/sentence/:sentenceId", FBAuth, updateSentence);
 app.delete("/sentence/:sentenceId", FBAuth, deleteSentence);
