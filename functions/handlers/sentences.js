@@ -32,6 +32,23 @@ exports.getAllSentences = (req, res) => {
     .catch(err => res.status(500).json(err));
 };
 
+exports.getSentence = (req, res) => {
+  db
+    .doc(`/sentences/${req.params.sentenceId}`)
+    .get()
+    .then(doc => {
+      if(!doc.exists) {
+        return res.status(404).json({ error: 'Sentence not found'});
+      }
+
+      sentenceData = doc.data();
+      sentenceData.sentenceId = doc.id;
+
+      return res.json(sentenceData);
+    })
+    .catch(err => console.error(err))
+}
+
 exports.createSentence = (req, res) => {
   if (req.user.owner) {
     const newSentence = {

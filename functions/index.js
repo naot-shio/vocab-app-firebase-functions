@@ -8,6 +8,7 @@ const { db } = require("./utils/admin");
 
 const {
   getAllSentences,
+  getSentence,
   createSentence,
   updateSentence,
   deleteSentence,
@@ -29,6 +30,7 @@ const {
 
 // sentence routes
 app.get("/sentences", getAllSentences);
+app.get('/sentence/:sentenceId', getSentence);
 app.get("/quiz", getRandomSentences);
 app.get("/sentences/likes", FBAuth, getLikedSentences);
 app.post("/sentence", FBAuth, createSentence);
