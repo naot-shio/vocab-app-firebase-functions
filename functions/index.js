@@ -30,20 +30,20 @@ const {
 
 // sentence routes
 app.get("/sentences", getAllSentences);
-app.get('/sentence/:sentenceId', getSentence);
+app.get("/sentence/:sentenceId", getSentence);
 app.get("/quiz", getRandomSentences);
 app.get("/sentences/likes", FBAuth, getLikedSentences);
+app.get("/sentence/:sentenceId/like", FBAuth, likeSentence);
+app.get("/sentence/:sentenceId/unlike", FBAuth, unlikeSentence);
 app.post("/sentence", FBAuth, createSentence);
 app.put("/sentence/:sentenceId", FBAuth, updateSentence);
 app.delete("/sentence/:sentenceId", FBAuth, deleteSentence);
-app.get("/sentence/:sentenceId/like", FBAuth, likeSentence);
-app.get("/sentence/:sentenceId/unlike", FBAuth, unlikeSentence);
 
 // user routes
+app.get("/user", FBAuth, getOwnDetails);
 app.post("/signup", signUp);
 app.post("/login", login);
 app.post("/user/image", FBAuth, imageUploader);
-app.get("/user", FBAuth, getOwnDetails);
 
 exports.api = functions.region("asia-northeast1").https.onRequest(app);
 
@@ -63,7 +63,5 @@ exports.onDeletingSentence = functions
         });
         return batch.commit();
       })
-      .catch(err => {
-        console.error(err);
-      });
+      .catch(err => err);
   });
