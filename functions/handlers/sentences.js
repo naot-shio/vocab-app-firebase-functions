@@ -65,10 +65,11 @@ exports.createSentence = (req, res) => {
         res.json(sentence);
       })
       .catch(err => res.status(500).json({ error: err.code }));
+  } else {
+     res
+      .status(400)
+      .json({ error: "You must be an owner to add vocabulary" }); 
   }
-  return res
-    .status(400)
-    .json({ error: "You must be an owner to add vocabulary" });
 };
 
 exports.updateSentence = (req, res) => {
