@@ -2,7 +2,7 @@
 
 英単語の記録していくアプリのバックエンド。
 
-## Frontend Github
+## Frontend GitHub
 https://github.com/naot-shio/vocab-app-firebase-frontend
 
 ## 主な機能 main functionalities 
@@ -15,6 +15,9 @@ https://github.com/naot-shio/vocab-app-firebase-frontend
 
 - Deploy
   - Firebase functions
+  
+- Database
+  - Firebase Firestore
   
 - Image Upload
   - busboy
